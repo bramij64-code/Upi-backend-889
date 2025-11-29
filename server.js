@@ -4,11 +4,15 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+
+// IMPORTANT 🔥
+// Webhook will NOT work without this
 app.use(express.urlencoded({ extended: true }));
 
+app.use(express.json());
+
 // ------------------------------
-// 1) Create Order API
+// Create Order
 // ------------------------------
 app.post("/create-order", async (req, res) => {
   try {
@@ -24,7 +28,7 @@ app.post("/create-order", async (req, res) => {
         customer_name: body.name,
         customer_email: body.email,
         customer_mobile: body.mobile,
-        redirect_url: "https://yourfrontend.com/success"
+        redirect_url: "https://upi345.netlify.app/success"
       }
     );
 
@@ -35,6 +39,31 @@ app.post("/create-order", async (req, res) => {
   }
 });
 
+// ------------------------------
+// Webhook Receiver
+// ------------------------------
+app.post("/webhook", (req, res) => {
+  console.log("WEBHOOK RECEIVED RAW BODY:", req.body);
+
+  const status = req.body.status;
+  const amount = req.body.amount;
+  const utr = req.body.upi_txn_id;
+  const orderId = req.body.id;
+
+  if (status === "success") {
+    console.log("PAYMENT SUCCESS 🎉", utr);
+  } else {
+    console.log("PAYMENT FAILED ❌");
+  }
+
+  res.send("OK");
+});
+
+// ------------------------------
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log("Backend running on port", port);
+});
 // ------------------------------
 // 2) Webhook Receiver
 // ------------------------------
