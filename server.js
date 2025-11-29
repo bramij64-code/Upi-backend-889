@@ -17,7 +17,7 @@ app.post("/create-order", async (req, res) => {
     const response = await axios.post(
       "https://merchant.upigateway.com/api/create_order",
       {
-        key: "YOUR_API_KEY",
+        key: "6116deb5-bf12-4176-b569-6299e702e974",
         client_txn_id: "txn_" + Date.now(),
         amount: body.amount,
         p_info: "Coins Purchase",
