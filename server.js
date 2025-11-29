@@ -4,11 +4,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors());
-
-// IMPORTANT 🔥
-// Webhook will NOT work without this
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.json());
 
 // ------------------------------
@@ -21,7 +17,7 @@ app.post("/create-order", async (req, res) => {
     const response = await axios.post(
       "https://merchant.upigateway.com/api/create_order",
       {
-        key: "6116deb5-bf12-4176-b569-6299e702e974",
+        key: "6116deb5-bf12-4176-b569-6299e702e974", // YOUR KEY
         client_txn_id: "txn_" + Date.now(),
         amount: body.amount,
         p_info: "Coins Purchase",
@@ -35,6 +31,32 @@ app.post("/create-order", async (req, res) => {
     res.json(response.data);
   } catch (err) {
     console.log(err);
+    res.json({ error: err.message, success: false });
+  }
+});
+
+// ------------------------------
+// Webhook Receiver
+// ------------------------------
+app.post("/webhook", (req, res) => {
+  console.log("WEBHOOK RECEIVED:", req.body);
+
+  if (req.body.status === "success") {
+    console.log("PAYMENT SUCCESS:", req.body.upi_txn_id);
+  } else {
+    console.log("PAYMENT FAILED");
+  }
+
+  res.send("OK");
+});
+
+// ------------------------------
+// START SERVER
+// ------------------------------
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log("Backend running on port", port);
+});    console.log(err);
     res.json({ error: err.message, success: false });
   }
 });
